@@ -19,14 +19,14 @@
     .job-detail-container {
         background: white;
         border-radius: 8px;
-        padding: 3rem;
+        padding: 2rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .job-header {
         border-bottom: 2px solid #ecf0f1;
-        padding-bottom: 2rem;
-        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .job-title {
@@ -44,8 +44,8 @@
     .job-meta-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .meta-item {
@@ -78,15 +78,33 @@
     }
 
     .job-section {
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .section-title {
         color: #2c3e50;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        margin-bottom: 0.75rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid #ecf0f1;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    .apply-link {
+        display: inline-block;
+        background-color: #27ae60;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .apply-link:hover {
+        background-color: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
     }
 
     .job-description {
@@ -94,30 +112,6 @@
         line-height: 1.8;
         font-size: 1.05rem;
         white-space: pre-wrap;
-    }
-
-    .data-grid {
-        display: grid;
-        gap: 1rem;
-    }
-
-    .data-row {
-        display: grid;
-        grid-template-columns: 200px 1fr;
-        gap: 1rem;
-        padding: 0.75rem;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-    }
-
-    .data-label {
-        font-weight: 600;
-        color: #555;
-    }
-
-    .data-value {
-        color: #333;
-        word-break: break-word;
     }
 
     .error-container {
@@ -140,9 +134,9 @@
 
     .application-status {
         background-color: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -299,28 +293,14 @@
 
         {% if job.application_url or job.apply_url or job.url %}
         <div class="job-section">
-            <h2 class="section-title">Apply</h2>
+            <h2 class="section-title">Ready to Apply?</h2>
             <a href="{{ job.application_url or job.apply_url or job.url }}"
                target="_blank"
-               style="display: inline-block; background-color: #3498db; color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: bold;">
+               class="apply-link">
                 Apply for this position &rarr;
             </a>
         </div>
         {% endif %}
-
-        <div class="job-section">
-            <h2 class="section-title">Additional Information</h2>
-            <div class="data-grid">
-                {% for key, value in job.items() %}
-                    {% if key not in ['title', 'company', 'description', 'requirements', 'benefits', 'location', 'job_type', 'type', 'salary', 'salary_range', 'posted_date', 'created_at', 'application_url', 'apply_url', 'url'] and value %}
-                    <div class="data-row">
-                        <div class="data-label">{{ key.replace('_', ' ').title() }}:</div>
-                        <div class="data-value">{{ value }}</div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
     </div>
 {% endif %}
 
