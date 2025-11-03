@@ -34,6 +34,25 @@ def jobs():
         return render_template('jobs.html', jobs=[], count=0, error=str(e))
 
 
+@app.route('/jobs/<job_id>')
+def job_detail(job_id):
+    """Render a single job details page."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM job_postings WHERE id = %s", (job_id,))
+        job = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if job is None:
+            return render_template('job_detail.html', job=None, error="Job not found"), 404
+
+        return render_template('job_detail.html', job=job)
+    except Exception as e:
+        return render_template('job_detail.html', job=None, error=str(e)), 500
+
+
 @app.route('/api/jobs')
 def api_jobs():
     """API endpoint: Fetch all job postings from the database as JSON."""

@@ -29,15 +29,22 @@
         gap: 1.5rem;
     }
 
+    .job-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
     .job-card {
         background: white;
         padding: 2rem;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
     }
 
-    .job-card:hover {
+    .job-card-link:hover .job-card {
         transform: translateY(-4px);
         box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
@@ -104,6 +111,41 @@
         border-radius: 8px;
         margin-bottom: 1rem;
     }
+
+    .applied-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #27ae60;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .apply-button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+    }
+
+    .apply-button:hover {
+        background-color: #2980b9;
+    }
+
+    .job-actions {
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 </style>
 {% endblock %}
 
@@ -122,52 +164,63 @@
 {% if jobs %}
     <div class="jobs-list">
         {% for job in jobs %}
-        <div class="job-card">
-            <h3 class="job-title">{{ job.title or 'Untitled Position' }}</h3>
+        <a href="/jobs/{{ job.id }}" class="job-card-link">
+            <div class="job-card">
+                <h3 class="job-title">{{ job.title or 'Untitled Position' }}</h3>
 
-            {% if job.company %}
-            <div class="job-company">{{ job.company }}</div>
-            {% endif %}
+                {% if job.company %}
+                <div class="job-company">{{ job.company }}</div>
+                {% endif %}
 
-            <div class="job-details">
-                {% if job.location %}
-                <div class="job-detail-item">
-                    <span>📍</span>
-                    <span>{{ job.location }}</span>
+                <div class="job-details">
+                    {% if job.location %}
+                    <div class="job-detail-item">
+                        <span>📍</span>
+                        <span>{{ job.location }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if job.job_type or job.type %}
+                    <div class="job-detail-item">
+                        <span>💼</span>
+                        <span>{{ job.job_type or job.type }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if job.salary %}
+                    <div class="job-detail-item">
+                        <span>💰</span>
+                        <span>{{ job.salary }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if job.description %}
+                <div class="job-description">
+                    {{ job.description[:300] }}{% if job.description|length > 300 %}...{% endif %}
                 </div>
                 {% endif %}
 
-                {% if job.job_type or job.type %}
-                <div class="job-detail-item">
-                    <span>💼</span>
-                    <span>{{ job.job_type or job.type }}</span>
+                <div class="job-meta">
+                    {% if job.id %}
+                    <span class="job-tag">ID: {{ job.id }}</span>
+                    {% endif %}
+
+                    {% if job.posted_date or job.created_at %}
+                    <span class="job-tag">Posted: {{ job.posted_date or job.created_at }}</span>
+                    {% endif %}
                 </div>
-                {% endif %}
 
-                {% if job.salary %}
-                <div class="job-detail-item">
-                    <span>💰</span>
-                    <span>{{ job.salary }}</span>
+                <div class="job-actions">
+                    <span class="applied-badge" id="badge-{{ job.id }}" style="display: none;">
+                        ✓ Applied
+                    </span>
+                    <button class="apply-button" id="btn-{{ job.id }}" onclick="event.preventDefault(); event.stopPropagation(); toggleApplied('{{ job.id }}');">
+                        Mark as Applied
+                    </button>
                 </div>
-                {% endif %}
             </div>
-
-            {% if job.description %}
-            <div class="job-description">
-                {{ job.description[:300] }}{% if job.description|length > 300 %}...{% endif %}
-            </div>
-            {% endif %}
-
-            <div class="job-meta">
-                {% if job.id %}
-                <span class="job-tag">ID: {{ job.id }}</span>
-                {% endif %}
-
-                {% if job.posted_date or job.created_at %}
-                <span class="job-tag">Posted: {{ job.posted_date or job.created_at }}</span>
-                {% endif %}
-            </div>
-        </div>
+        </a>
         {% endfor %}
     </div>
 {% else %}
@@ -176,4 +229,60 @@
         <p>Check back soon for new opportunities!</p>
     </div>
 {% endif %}
+
+<script>
+    // Get applied jobs from localStorage
+    function getAppliedJobs() {
+        const stored = localStorage.getItem('appliedJobs');
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    // Save applied jobs to localStorage
+    function saveAppliedJobs(jobs) {
+        localStorage.setItem('appliedJobs', JSON.stringify(jobs));
+    }
+
+    // Toggle applied status for a job
+    function toggleApplied(jobId) {
+        let appliedJobs = getAppliedJobs();
+        const index = appliedJobs.indexOf(jobId);
+
+        if (index > -1) {
+            // Remove from applied
+            appliedJobs.splice(index, 1);
+        } else {
+            // Add to applied
+            appliedJobs.push(jobId);
+        }
+
+        saveAppliedJobs(appliedJobs);
+        updateJobUI(jobId);
+    }
+
+    // Update UI for a specific job
+    function updateJobUI(jobId) {
+        const appliedJobs = getAppliedJobs();
+        const isApplied = appliedJobs.includes(jobId);
+        const badge = document.getElementById('badge-' + jobId);
+        const button = document.getElementById('btn-' + jobId);
+
+        if (badge && button) {
+            if (isApplied) {
+                badge.style.display = 'inline-flex';
+                button.style.display = 'none';
+            } else {
+                badge.style.display = 'none';
+                button.style.display = 'inline-block';
+            }
+        }
+    }
+
+    // Initialize UI on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const appliedJobs = getAppliedJobs();
+        appliedJobs.forEach(jobId => {
+            updateJobUI(jobId);
+        });
+    });
+</script>
 {% endblock %}

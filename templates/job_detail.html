@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+
+{% block title %}{% if job %}{{ job.title or 'Job Details' }}{% else %}Job Not Found{% endif %} - SD Jobs Board{% endblock %}
+
+{% block styles %}
+<style>
+    .back-link {
+        display: inline-block;
+        color: #3498db;
+        text-decoration: none;
+        margin-bottom: 2rem;
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .job-detail-container {
+        background: white;
+        border-radius: 8px;
+        padding: 3rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .job-header {
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .job-title {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-company {
+        color: #3498db;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .meta-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .meta-content {
+        flex: 1;
+    }
+
+    .meta-label {
+        font-size: 0.875rem;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .meta-value {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .job-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ecf0f1;
+    }
+
+    .job-description {
+        color: #555;
+        line-height: 1.8;
+        font-size: 1.05rem;
+        white-space: pre-wrap;
+    }
+
+    .data-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .data-row {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 1rem;
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    .data-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .data-value {
+        color: #333;
+        word-break: break-word;
+    }
+
+    .error-container {
+        background-color: #e74c3c;
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .not-found-container {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .not-found-container h2 {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+    }
+
+    .application-status {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .applied-badge-large {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background-color: #27ae60;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .apply-button-large {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: background-color 0.3s;
+    }
+
+    .apply-button-large:hover {
+        background-color: #2980b9;
+    }
+
+    .remove-button {
+        background-color: #95a5a6;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+    }
+
+    .remove-button:hover {
+        background-color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="/jobs" class="back-link">&larr; Back to all jobs</a>
+
+{% if error %}
+    <div class="error-container">
+        <h2>Error</h2>
+        <p>{{ error }}</p>
+    </div>
+{% elif not job %}
+    <div class="not-found-container">
+        <h2>Job Not Found</h2>
+        <p>The job you're looking for doesn't exist or has been removed.</p>
+    </div>
+{% else %}
+    <div class="job-detail-container">
+        <div class="job-header">
+            <h1 class="job-title">{{ job.title or 'Untitled Position' }}</h1>
+
+            {% if job.company %}
+            <div class="job-company">{{ job.company }}</div>
+            {% endif %}
+        </div>
+
+        <div class="application-status">
+            <div>
+                <span class="applied-badge-large" id="applied-badge" style="display: none;">
+                    ✓ You've Applied to This Job
+                </span>
+            </div>
+            <div>
+                <button class="apply-button-large" id="apply-btn" onclick="toggleApplied('{{ job.id }}');" style="display: none;">
+                    Mark as Applied
+                </button>
+                <button class="remove-button" id="remove-btn" onclick="toggleApplied('{{ job.id }}');" style="display: none;">
+                    Remove Application
+                </button>
+            </div>
+        </div>
+
+        <div class="job-meta-grid">
+            {% if job.location %}
+            <div class="meta-item">
+                <div class="meta-icon">📍</div>
+                <div class="meta-content">
+                    <div class="meta-label">Location</div>
+                    <div class="meta-value">{{ job.location }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if job.job_type or job.type %}
+            <div class="meta-item">
+                <div class="meta-icon">💼</div>
+                <div class="meta-content">
+                    <div class="meta-label">Job Type</div>
+                    <div class="meta-value">{{ job.job_type or job.type }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if job.salary or job.salary_range %}
+            <div class="meta-item">
+                <div class="meta-icon">💰</div>
+                <div class="meta-content">
+                    <div class="meta-label">Salary</div>
+                    <div class="meta-value">{{ job.salary or job.salary_range }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if job.posted_date or job.created_at %}
+            <div class="meta-item">
+                <div class="meta-icon">📅</div>
+                <div class="meta-content">
+                    <div class="meta-label">Posted</div>
+                    <div class="meta-value">{{ job.posted_date or job.created_at }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if job.description %}
+        <div class="job-section">
+            <h2 class="section-title">Job Description</h2>
+            <div class="job-description">{{ job.description }}</div>
+        </div>
+        {% endif %}
+
+        {% if job.requirements %}
+        <div class="job-section">
+            <h2 class="section-title">Requirements</h2>
+            <div class="job-description">{{ job.requirements }}</div>
+        </div>
+        {% endif %}
+
+        {% if job.benefits %}
+        <div class="job-section">
+            <h2 class="section-title">Benefits</h2>
+            <div class="job-description">{{ job.benefits }}</div>
+        </div>
+        {% endif %}
+
+        {% if job.application_url or job.apply_url or job.url %}
+        <div class="job-section">
+            <h2 class="section-title">Apply</h2>
+            <a href="{{ job.application_url or job.apply_url or job.url }}"
+               target="_blank"
+               style="display: inline-block; background-color: #3498db; color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                Apply for this position &rarr;
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="job-section">
+            <h2 class="section-title">Additional Information</h2>
+            <div class="data-grid">
+                {% for key, value in job.items() %}
+                    {% if key not in ['title', 'company', 'description', 'requirements', 'benefits', 'location', 'job_type', 'type', 'salary', 'salary_range', 'posted_date', 'created_at', 'application_url', 'apply_url', 'url'] and value %}
+                    <div class="data-row">
+                        <div class="data-label">{{ key.replace('_', ' ').title() }}:</div>
+                        <div class="data-value">{{ value }}</div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    // Get applied jobs from localStorage
+    function getAppliedJobs() {
+        const stored = localStorage.getItem('appliedJobs');
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    // Save applied jobs to localStorage
+    function saveAppliedJobs(jobs) {
+        localStorage.setItem('appliedJobs', JSON.stringify(jobs));
+    }
+
+    // Toggle applied status for the current job
+    function toggleApplied(jobId) {
+        let appliedJobs = getAppliedJobs();
+        const index = appliedJobs.indexOf(jobId);
+
+        if (index > -1) {
+            // Remove from applied
+            appliedJobs.splice(index, 1);
+        } else {
+            // Add to applied
+            appliedJobs.push(jobId);
+        }
+
+        saveAppliedJobs(appliedJobs);
+        updateUI(jobId);
+    }
+
+    // Update UI based on application status
+    function updateUI(jobId) {
+        const appliedJobs = getAppliedJobs();
+        const isApplied = appliedJobs.includes(jobId);
+
+        const badge = document.getElementById('applied-badge');
+        const applyBtn = document.getElementById('apply-btn');
+        const removeBtn = document.getElementById('remove-btn');
+
+        if (badge && applyBtn && removeBtn) {
+            if (isApplied) {
+                badge.style.display = 'inline-flex';
+                applyBtn.style.display = 'none';
+                removeBtn.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+                applyBtn.style.display = 'inline-block';
+                removeBtn.style.display = 'none';
+            }
+        }
+    }
+
+    // Initialize UI on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const jobId = '{{ job.id if job else "" }}';
+        if (jobId) {
+            updateUI(jobId);
+        }
+    });
+</script>
+{% endblock %}

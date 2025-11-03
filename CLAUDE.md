@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Flask application designed for deployment on Railway. It serves job listings from a Postgres database and provides a REST API to access them.
+This is a Flask application designed for deployment on Railway. It serves job listings from a Postgres database and provides a REST API to access them. Users can track which jobs they've applied to using browser local storage.
 
 ## Development Commands
 
@@ -36,7 +36,8 @@ gunicorn main:app
 - **templates/**: HTML templates for the web UI
   - `base.html` - Base template with header, nav, and footer
   - `index.html` - Home page with hero section
-  - `jobs.html` - Job listings page with card-based layout
+  - `jobs.html` - Job listings page with card-based layout (clickable cards)
+  - `job_detail.html` - Individual job details page with full information
 
 ### Database
 
@@ -48,12 +49,27 @@ gunicorn main:app
 
 **Web UI Routes:**
 - `GET /` - Home page with welcome message and features
-- `GET /jobs` - Job listings page with HTML UI
+- `GET /jobs` - Job listings page with HTML UI (all jobs)
+- `GET /jobs/<job_id>` - Individual job details page
 
 **API Routes:**
 - `GET /api/jobs` - Returns all job postings as JSON
   - Returns JSON: `{"jobs": [...], "count": n}`
   - Orders by id
+
+### Application Tracking
+
+The app includes client-side application tracking using browser localStorage:
+
+- **Storage**: Job IDs are stored in `localStorage` under key `appliedJobs` as a JSON array
+- **Jobs List Page**: Shows "Mark as Applied" button on each job card
+  - Applied jobs show green "✓ Applied" badge instead
+  - Click to toggle application status
+- **Job Details Page**: Shows application status with larger badge
+  - "Mark as Applied" button if not applied
+  - "Remove Application" button if already applied
+- **Persistence**: Application status persists across sessions in the same browser
+- **Privacy**: All data stored locally in browser, not on server
 
 ## Environment Variables
 
