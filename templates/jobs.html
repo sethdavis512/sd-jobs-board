@@ -55,26 +55,6 @@
         margin-bottom: 0.5rem;
     }
 
-    .job-company {
-        color: #3498db;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-    }
-
-    .job-details {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        color: #7f8c8d;
-    }
-
-    .job-detail-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
     .job-description {
         color: #555;
         line-height: 1.6;
@@ -168,48 +148,18 @@
             <div class="job-card">
                 <h3 class="job-title">{{ job.title or 'Untitled Position' }}</h3>
 
-                {% if job.company %}
-                <div class="job-company">{{ job.company }}</div>
+                {% if job.pubdate %}
+                <div class="job-meta" style="margin-bottom: 1rem;">
+                    <span class="job-tag">📅 Posted: {{ job.pubdate }}</span>
+                </div>
                 {% endif %}
 
-                <div class="job-details">
-                    {% if job.location %}
-                    <div class="job-detail-item">
-                        <span>📍</span>
-                        <span>{{ job.location }}</span>
-                    </div>
-                    {% endif %}
-
-                    {% if job.job_type or job.type %}
-                    <div class="job-detail-item">
-                        <span>💼</span>
-                        <span>{{ job.job_type or job.type }}</span>
-                    </div>
-                    {% endif %}
-
-                    {% if job.salary %}
-                    <div class="job-detail-item">
-                        <span>💰</span>
-                        <span>{{ job.salary }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-
-                {% if job.description %}
+                {% if job.content or job.contentsnippet %}
                 <div class="job-description">
-                    {{ job.description[:300] }}{% if job.description|length > 300 %}...{% endif %}
+                    {% set desc = job.content or job.contentsnippet %}
+                    {{ desc[:250] }}{% if desc|length > 250 %}...{% endif %}
                 </div>
                 {% endif %}
-
-                <div class="job-meta">
-                    {% if job.id %}
-                    <span class="job-tag">ID: {{ job.id }}</span>
-                    {% endif %}
-
-                    {% if job.posted_date or job.created_at %}
-                    <span class="job-tag">Posted: {{ job.posted_date or job.created_at }}</span>
-                    {% endif %}
-                </div>
 
                 <div class="job-actions">
                     <span class="applied-badge" id="badge-{{ job.id }}" style="display: none;">

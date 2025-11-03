@@ -36,13 +36,18 @@ gunicorn main:app
 - **templates/**: HTML templates for the web UI
   - `base.html` - Base template with header, nav, and footer
   - `index.html` - Home page with hero section
-  - `jobs.html` - Job listings page with card-based layout (clickable cards)
-  - `job_detail.html` - Individual job details page with full information
+  - `jobs.html` - Job listings page displaying title, pubdate, content snippet (250 chars), and application tracking
+  - `job_detail.html` - Individual job details page showing title, pubdate, full content, link to apply, and application tracking
 
 ### Database
 
 - **Connection**: Uses `DATABASE_URL` environment variable for Postgres connection
-- **Table**: `job_postings` - contains job listing data
+- **Table**: `job_postings` - contains job listing data with the following fields:
+  - `id` - Unique identifier (used for routing and tracking)
+  - `title` - Job title
+  - `link` - URL to the external job posting/application
+  - `content` or `contentsnippet` - Job description text
+  - `pubdate` - Publication/posting date
 - **Driver**: psycopg2-binary for Postgres connectivity
 
 ### Routes

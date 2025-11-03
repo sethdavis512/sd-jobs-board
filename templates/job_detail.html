@@ -35,47 +35,6 @@
         margin-bottom: 1rem;
     }
 
-    .job-company {
-        color: #3498db;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .job-meta-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .meta-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
-
-    .meta-icon {
-        font-size: 1.5rem;
-        flex-shrink: 0;
-    }
-
-    .meta-content {
-        flex: 1;
-    }
-
-    .meta-label {
-        font-size: 0.875rem;
-        color: #7f8c8d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.25rem;
-    }
-
-    .meta-value {
-        color: #2c3e50;
-        font-size: 1.1rem;
-        font-weight: 500;
-    }
 
     .job-section {
         margin-bottom: 1.5rem;
@@ -207,8 +166,10 @@
         <div class="job-header">
             <h1 class="job-title">{{ job.title or 'Untitled Position' }}</h1>
 
-            {% if job.company %}
-            <div class="job-company">{{ job.company }}</div>
+            {% if job.pubdate %}
+            <div style="color: #7f8c8d; margin-top: 0.5rem;">
+                Posted: {{ job.pubdate }}
+            </div>
             {% endif %}
         </div>
 
@@ -228,73 +189,16 @@
             </div>
         </div>
 
-        <div class="job-meta-grid">
-            {% if job.location %}
-            <div class="meta-item">
-                <div class="meta-icon">📍</div>
-                <div class="meta-content">
-                    <div class="meta-label">Location</div>
-                    <div class="meta-value">{{ job.location }}</div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if job.job_type or job.type %}
-            <div class="meta-item">
-                <div class="meta-icon">💼</div>
-                <div class="meta-content">
-                    <div class="meta-label">Job Type</div>
-                    <div class="meta-value">{{ job.job_type or job.type }}</div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if job.salary or job.salary_range %}
-            <div class="meta-item">
-                <div class="meta-icon">💰</div>
-                <div class="meta-content">
-                    <div class="meta-label">Salary</div>
-                    <div class="meta-value">{{ job.salary or job.salary_range }}</div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if job.posted_date or job.created_at %}
-            <div class="meta-item">
-                <div class="meta-icon">📅</div>
-                <div class="meta-content">
-                    <div class="meta-label">Posted</div>
-                    <div class="meta-value">{{ job.posted_date or job.created_at }}</div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        {% if job.description %}
+        {% if job.content or job.contentsnippet %}
         <div class="job-section">
-            <h2 class="section-title">Job Description</h2>
-            <div class="job-description">{{ job.description }}</div>
+            <div class="job-description">{{ job.content or job.contentsnippet }}</div>
         </div>
         {% endif %}
 
-        {% if job.requirements %}
-        <div class="job-section">
-            <h2 class="section-title">Requirements</h2>
-            <div class="job-description">{{ job.requirements }}</div>
-        </div>
-        {% endif %}
-
-        {% if job.benefits %}
-        <div class="job-section">
-            <h2 class="section-title">Benefits</h2>
-            <div class="job-description">{{ job.benefits }}</div>
-        </div>
-        {% endif %}
-
-        {% if job.application_url or job.apply_url or job.url %}
+        {% if job.link %}
         <div class="job-section">
             <h2 class="section-title">Ready to Apply?</h2>
-            <a href="{{ job.application_url or job.apply_url or job.url }}"
+            <a href="{{ job.link }}"
                target="_blank"
                class="apply-link">
                 Apply for this position &rarr;
