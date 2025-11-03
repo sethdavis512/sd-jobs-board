@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Job Listings - SD Jobs Board{% endblock %}
+
+{% block styles %}
+<style>
+    .jobs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .jobs-header h2 {
+        color: #2c3e50;
+        font-size: 2rem;
+    }
+
+    .job-count {
+        background-color: #3498db;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .jobs-list {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .job-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .job-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .job-company {
+        color: #3498db;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: #7f8c8d;
+    }
+
+    .job-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .job-description {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .job-tag {
+        background-color: #ecf0f1;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .no-jobs {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 8px;
+        color: #7f8c8d;
+    }
+
+    .error-message {
+        background-color: #e74c3c;
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if error %}
+    <div class="error-message">
+        <strong>Error:</strong> {{ error }}
+    </div>
+{% endif %}
+
+<div class="jobs-header">
+    <h2>Available Positions</h2>
+    <span class="job-count">{{ count }} Jobs</span>
+</div>
+
+{% if jobs %}
+    <div class="jobs-list">
+        {% for job in jobs %}
+        <div class="job-card">
+            <h3 class="job-title">{{ job.title or 'Untitled Position' }}</h3>
+
+            {% if job.company %}
+            <div class="job-company">{{ job.company }}</div>
+            {% endif %}
+
+            <div class="job-details">
+                {% if job.location %}
+                <div class="job-detail-item">
+                    <span>📍</span>
+                    <span>{{ job.location }}</span>
+                </div>
+                {% endif %}
+
+                {% if job.job_type or job.type %}
+                <div class="job-detail-item">
+                    <span>💼</span>
+                    <span>{{ job.job_type or job.type }}</span>
+                </div>
+                {% endif %}
+
+                {% if job.salary %}
+                <div class="job-detail-item">
+                    <span>💰</span>
+                    <span>{{ job.salary }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if job.description %}
+            <div class="job-description">
+                {{ job.description[:300] }}{% if job.description|length > 300 %}...{% endif %}
+            </div>
+            {% endif %}
+
+            <div class="job-meta">
+                {% if job.id %}
+                <span class="job-tag">ID: {{ job.id }}</span>
+                {% endif %}
+
+                {% if job.posted_date or job.created_at %}
+                <span class="job-tag">Posted: {{ job.posted_date or job.created_at }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-jobs">
+        <h3>No jobs available at the moment</h3>
+        <p>Check back soon for new opportunities!</p>
+    </div>
+{% endif %}
+{% endblock %}
